@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>File Sharing Web App</title>
+  </head>
+  <body>
+    <h1>File Sharing Web App</h1>
+    <form id="file-form">
+      <input type="file" id="file-input">
+      <button type="submit">Upload</button>
+    </form>
+    <div id="file-list"></div>
+
+    <script>
+      const fileForm = document.getElementById("file-form");
+      const fileInput = document.getElementById("file-input");
+      const fileList = document.getElementById("file-list");
+
+      fileForm.addEventListener("submit", async (event) => {
+        event.preventDefault();
+
+        const formData = new FormData();
+        formData.append("file", fileInput.files[0]);
+
+        const response = await fetch("/upload", {
+          method: "POST",
+          body: formData,
+        });
+
+        if (response.ok) {
+          fileList.innerHTML = "";
+          const files = await response.json();
+          files.forEach((file) => {
+            const link = document.createElement("a");
+            link.href = `/download/${file.id}`;
+            link.textContent = file.name;
+            fileList.appendChild(link);
+            fileList.appendChild(document.createElement("br"));
+          });
+        }
+      });
+    </script>
+  </body>
+</html>
